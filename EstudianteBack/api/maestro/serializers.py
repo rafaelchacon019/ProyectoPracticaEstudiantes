@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import maestro
-from api.estudiante.models import estudiante
-
+from api.materias.models import materias
 
 class MaestroSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,9 +12,13 @@ class MaestroGetSerializer(serializers.ModelSerializer):
         model = maestro
         fields = '__all__'
 
-class MixEstudianteSerializer(serializers.ModelSerializer):
+class AllMateriasSerializer(serializers.ModelSerializer):
     class Meta:
-        model = estudiante
-        fields = ('id','nombre','apellido')
+        model = materias
+        fields = ('id','nombre')
 
-        
+class MixMaestrosMateriasSerializer(serializers.ModelSerializer):
+    materia = AllMateriasSerializer(many=True, read_only=True, source='materias_set')
+    class Meta:
+        model = maestro
+        fields = ('id', 'nombre','materia')

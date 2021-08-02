@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import maestro
-from.serializers import MaestroSerializer, MaestroGetSerializer, MixEstudianteSerializer
+from.serializers import MaestroSerializer, MaestroGetSerializer, MixMaestrosMateriasSerializer
 
 # Create your views here.
 class MaestroViews(APIView):
@@ -46,5 +46,19 @@ class MaestroViews(APIView):
             maestros = maestro.objects.get(id=id)
             maestros.delete()
             return Response(['Elemento eliminado.'], status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+class MateriasByMaestro(APIView):
+
+    def get(self, request, id=None):
+        try:
+            listas = maestro.objects.all().filter(id=id)
+            if listas:
+                serializer = MixMaestrosMateriasSerializer(listas, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(['No se necuentra información con ese id'], status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)

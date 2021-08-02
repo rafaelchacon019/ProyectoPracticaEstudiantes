@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import estudiante
-from.serializers import EstudianteSerializer, EstudianteGetSerializer
+from.serializers import EstudianteSerializer, EstudianteGetSerializer, MixTablasSerializer
 
 # Create your views here.
 class EstudianteViews(APIView):
@@ -46,5 +46,19 @@ class EstudianteViews(APIView):
             estudiantes = estudiante.objects.get(id=id)
             estudiantes.delete()
             return Response(['Elemento eliminado.'], status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+class EstudianteByAll(APIView):
+
+    def get(self, request, id=None):
+        try:
+            listas = estudiante.objects.all().filter(id=id)
+            if listas:
+                serializer = MixTablasSerializer(listas, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(['No se necuentra información con ese id'], status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response(str(e), status=status.HTTP_503_SERVICE_UNAVAILABLE)
